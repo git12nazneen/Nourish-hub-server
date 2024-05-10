@@ -27,6 +27,19 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
     // Send a ping to confirm a successful connection
+
+    const addHubCollection = client.db('nourish-hub').collection('room')
+    
+    // hub api collection
+
+    app.get('/room', async(req, res)=>{
+        const query = addHubCollection.find()
+        const result = await query.toArray()
+        res.send(result);
+    })
+
+
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {

@@ -1,0 +1,74 @@
+[
+    {
+      "country": "Hungary",
+      "city": "Budapest",
+      "hotel_name": "Danube View Hotel",
+      "room_description": "Deluxe Double Room with Danube River View. This spacious room features a comfortable king-sized bed, a private balcony overlooking the majestic Danube River, and modern amenities for a luxurious stay.",
+      "price_per_night": 150,
+      "room_size": "35 sqm",
+      "availability": "available",
+      "room_images": "https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      "special_offers": ["Free breakfast for guests", "10% discount for bookings over 5 nights"],
+      "total_reviews": 120
+    },
+    {
+      "country": "Hungary",
+      "city": "Budapest",
+      "hotel_name": "Castle Hill Suites",
+      "room_description": "Executive Suite with Castle View. Indulge in the elegance of this executive suite offering stunning views of Budapest's historic Castle Hill. The suite features a spacious living area, a luxurious king-sized bed, and stylish furnishings.",
+      "price_per_night": 200,
+      "room_size": "45 sqm",
+      "availability": "available",
+      "room_images": "https://images.pexels.com/photos/271619/pexels-photo-271619.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      "special_offers": ["Free dinner cruise on the Danube for guests staying 3 nights or more"],
+      "total_reviews": 90
+    },
+    {
+      "country": "Hungary",
+      "city": "Debrecen",
+      "hotel_name": "Great Plain Hotel",
+      "room_description": "Standard Twin Room. Enjoy a comfortable stay in this standard twin room featuring two cozy single beds, a modern ensuite bathroom, and essential amenities for a relaxing visit to Debrecen.",
+      "price_per_night": 100,
+      "room_size": "30 sqm",
+      "availability": "available",
+      "room_images": "https://images.pexels.com/photos/1374125/pexels-photo-1374125.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      "special_offers": ["50% discount on spa treatments for guests booking the suite"],
+      "total_reviews": 70
+    },
+    {
+      "country": "Hungary",
+      "city": "Szeged",
+      "hotel_name": "Riverside Residence",
+      "room_description": "Family Suite with Riverfront Terrace. Ideal for families, this spacious suite offers a comfortable king-sized bed, a separate living area with a sofa bed, and a private terrace overlooking the scenic riverside.",
+      "price_per_night": 180,
+      "room_size": "50 sqm",
+      "availability": "available",
+      "room_images":"https://images.pexels.com/photos/4112553/pexels-photo-4112553.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      "special_offers": ["Complimentary soft drinks upon arrival"],
+      "total_reviews": 110
+    },
+    {
+      "country": "Hungary",
+      "city": "Pécs",
+      "hotel_name": "Art Nouveau Palace",
+      "room_description": "Junior Suite with Garden View. Experience luxury in this stylish junior suite boasting a plush queen-sized bed, a private balcony overlooking the tranquil garden, and elegant Art Nouveau décor.",
+      "price_per_night": 170,
+      "room_size": "40 sqm",
+      "availability": "available",
+      "room_images": "https://images.pexels.com/photos/376531/pexels-photo-376531.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      "special_offers": ["Complimentary bottle of soft drinks upon arrival"],
+      "total_reviews": 150
+    },
+    {
+      "country": "Hungary",
+      "city": "Eger",
+      "hotel_name": "Castle Hill Inn",
+      "room_description": "Premium Double Room with Castle View. Enjoy breathtaking views of Eger's iconic castle from this premium double room, featuring a comfortable double bed, a spacious ensuite bathroom, and modern amenities.",
+      "price_per_night": 220,
+      "room_size": "55 sqm",
+      "availability": "available",
+      "room_images":"https://images.pexels.com/photos/1669799/pexels-photo-1669799.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+      "special_offers": ["Spa package included for weekend bookings"],
+      "total_reviews": 80
+    }
+]
