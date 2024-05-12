@@ -101,6 +101,32 @@ async function run() {
       res.send(result);
     })
 
+ 
+
+    app.patch('/booking/:id', async (req, res) => {
+      try {
+          const id = req.params.id;
+          const newDate = req.body.date; 
+    
+          // Convert id to ObjectId
+          const objectId = new ObjectId(id);
+    
+          // Update the booking date in the database
+          const result = await addBookingCollection.updateOne({ _id: objectId }, { $set: { date: newDate } });
+    
+          // Check if the update was successful
+          if (result.modifiedCount > 0) {
+              res.json({ success: true, message: 'Booking date updated successfully.' });
+          } else {
+              res.status(404).json({ success: false, message: 'Booking not found.' });
+          }
+      } catch (error) {
+          console.error('Error updating booking date:', error);
+          res.status(500).json({ success: false, message: 'Internal server error.' });
+      }
+    });
+    
+
     // get all booking room by a specific user
   
 
