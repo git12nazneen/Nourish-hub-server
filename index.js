@@ -19,7 +19,7 @@ app.use(
   })
 );
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json());
 
 // LWRWyXeHuvl3COfh
@@ -43,6 +43,7 @@ async function run() {
 
     const addHubCollection = client.db('nourish-hub').collection('room')
     const addBookingCollection = client.db('nourish-hub').collection('booking')
+    const addReviewCollection = client.db('nourish-hub').collection('review')
     
     // hub api collection
 
@@ -59,6 +60,20 @@ async function run() {
       res.send(result)
     })
     
+    // review 
+    app.get('/review', async(req, res)=>{
+      const query = addReviewCollection.find().sort({ "startDate": -1 });
+      const result = await query.toArray()
+      res.send(result);
+  })
+
+  app.post('/review', async(req, res)=>{
+    const review = req.body;
+    console.log(review)
+    const result = await addReviewCollection.insertOne(review)
+    res.send(result);
+  })
+
     // price filter
 
       // Express route to handle data filtering
@@ -108,13 +123,13 @@ async function run() {
           const id = req.params.id;
           const newDate = req.body.date; 
     
-          // Convert id to ObjectId
+        
           const objectId = new ObjectId(id);
     
-          // Update the booking date in the database
+      
           const result = await addBookingCollection.updateOne({ _id: objectId }, { $set: { date: newDate } });
     
-          // Check if the update was successful
+        
           if (result.modifiedCount > 0) {
               res.json({ success: true, message: 'Booking date updated successfully.' });
           } else {
