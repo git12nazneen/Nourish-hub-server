@@ -92,7 +92,14 @@ async function run() {
       res.send(result);
     })
 
-
+    // booking delete
+    app.delete('/booking/:id', async(req, res)=>{
+      const id = req.params.id;
+      console.log('delete booking', id);
+      const query = {_id: new ObjectId(id)}
+      const result = await addBookingCollection.deleteOne(query)
+      res.send(result);
+    })
 
     // get all booking room by a specific user
   
