@@ -19,7 +19,7 @@ app.use(
   })
 );
 
-// app.use(cors());
+app.use(cors());
 app.use(express.json());
 
 // LWRWyXeHuvl3COfh
@@ -60,17 +60,23 @@ async function run() {
     })
     
     // price filter
-    // app.get('/room', async(req, res)=>{
-    //   const filter = req.query.price_per_night;
-    //  let query ={}
-    // //  if(filter) query ={price_per_night: filter}
-    // if (filter) {
-    //   query = { price_per_night: filter };
 
-    // }
-    //  const result = await addHubCollection.find(query)
-    //   res.send(result);
-    // })
+      // Express route to handle data filtering
+      // app.get('/room', (req, res) => {
+      //   const { minAge, maxAge } = req.query;
+
+      //   // Perform filtering based on query parameters
+      //   const filteredData = addHubCollection.filter(item => {
+      //     return (!minAge || item.price_per_night >= minAge) && (!maxAge || item.price_per_night <= maxAge);
+      //   });
+
+      //   res.send(filteredData);
+      // });
+      // app.get('/room/filter', (req, res) => {
+      //   const { price } = req.query;
+      //   const filteredRooms = room.filter(rooms => rooms.price_per_night <= parseInt(price));
+      //   res.send(filteredRooms);
+      // });
 
     // booking
 
@@ -89,13 +95,13 @@ async function run() {
 
 
     // get all booking room by a specific user
-    app.get('/booking/:email', async(req, res)=>{
-      const email = req.params.email;
-      const query = {'email':new ObjectId (email)}
-      const result = await addBookingCollection.findOne(query);
-      res.send(result)
-    })
-   
+  
+
+      app.get('/booking/:email', async (req, res) => {
+        const email = req.params.email;
+        const result = await addBookingCollection.find({ email }).toArray();
+        res.send(result);
+      });
 
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
