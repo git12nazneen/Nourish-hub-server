@@ -60,6 +60,21 @@ async function run() {
       res.send(result)
     })
     
+    app.put("/room/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const options = {upsert: true};
+      const updateAvailability = req.body; 
+      console.log('issabll', updateAvailability.isAvailable)
+      const spot = {
+        $set: {
+          availability: updateAvailability.isAvailable,
+        },
+      };
+      const result = await addHubCollection.updateOne(filter, spot, options);
+      res.send(result);
+    });
+
     // review 
     app.get('/review', async(req, res)=>{
       const query = addReviewCollection.find().sort({ "startDate": -1 });
@@ -76,22 +91,61 @@ async function run() {
 
     // price filter
 
-      // Express route to handle data filtering
-      // app.get('/room', (req, res) => {
-      //   const { minAge, maxAge } = req.query;
-
-      //   // Perform filtering based on query parameters
-      //   const filteredData = addHubCollection.filter(item => {
-      //     return (!minAge || item.price_per_night >= minAge) && (!maxAge || item.price_per_night <= maxAge);
-      //   });
-
-      //   res.send(filteredData);
-      // });
-      // app.get('/room/filter', (req, res) => {
-      //   const { price } = req.query;
-      //   const filteredRooms = room.filter(rooms => rooms.price_per_night <= parseInt(price));
-      //   res.send(filteredRooms);
-      // });
+    // app.get('/rooms-filter', async (req, res) => {
+    //   const { minPrice, maxPrice } = req.query;
+    //   let filter = {};
+    
+    //   if (minPrice && maxPrice) {
+    //     filter = {
+    //       price_per_night: {
+    //         $gte: parseInt(minPrice),
+    //         $lte: parseInt(maxPrice)
+    //       }
+    //     };
+    //   } else if (minPrice) {
+    //     filter = { price_per_night: { $gte: parseInt(minPrice) } };
+    //   } else if (maxPrice) {
+    //     filter = { price_per_night: { $lte: parseInt(maxPrice) } };
+    //   } else {
+    //     // No price filter applied
+    //     filter = {};
+    //   }
+    
+    //   const cursor = addHubCollection.find(filter);
+    //   const result = await cursor.toArray();
+    //   res.send(result);
+    // });
+    
+    app.get('/rooms-filter', async (req, res) => {
+      const { minPrice, maxPrice } = req.query;
+      let filter = {};
+    
+      if (minPrice && maxPrice) {
+        filter = {
+          price_per_night: {
+            $gte: parseInt(minPrice),
+            $lte: parseInt(maxPrice),
+          },
+        };
+      } else if (minPrice) {
+        filter = { price_per_night: { $gte: parseInt(minPrice) } };
+      } else if (maxPrice) {
+        filter = { price_per_night: { $lte: parseInt(maxPrice) } };
+      } else {
+        // No price filter applied
+        filter = {};
+      }
+    
+      try {
+        const cursor = addHubCollection.find(filter);
+        const result = await cursor.toArray();
+        res.json(result);
+      } catch (error) {
+        console.error('Error fetching filtered rooms:', error);
+        res.status(500).json({ error: 'An error occurred while fetching filtered rooms' });
+      }
+    });
+  
 
     // booking
 
@@ -122,14 +176,8 @@ async function run() {
       try {
           const id = req.params.id;
           const newDate = req.body.date; 
-    
-        
           const objectId = new ObjectId(id);
-    
-      
           const result = await addBookingCollection.updateOne({ _id: objectId }, { $set: { date: newDate } });
-    
-        
           if (result.modifiedCount > 0) {
               res.json({ success: true, message: 'Booking date updated successfully.' });
           } else {
