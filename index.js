@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
@@ -18,7 +20,7 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(cookieParser());
 // app.use(cors());
 app.use(express.json());
 
@@ -35,6 +37,30 @@ const client = new MongoClient(uri, {
   }
 });
 
+// middlewares 
+const logger = (req, res, next)=>{
+  console.log('log info',req.method, req.url);
+  next();
+}
+
+const verifyToken = (req, res, next)=>{
+  const token = req?.cookies?.token;
+  // console.log('token in the middleware', token);
+  // no token available
+  if(!token){
+    return res.status(401).send({message: 'unauthorized access'})
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded)=>{
+    if(err){
+      return res.status(401).send({message: 'unauthorized access'})
+    }
+    req.user = decoded;
+    next()
+  })
+
+}
+
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -45,22 +71,54 @@ async function run() {
     const addBookingCollection = client.db('nourish-hub').collection('booking')
     const addReviewCollection = client.db('nourish-hub').collection('review')
     
+
+    // auth related api
+    app.post('/jwt',logger, async(req, res)=>{
+      const user = req.body;
+      console.log('user for token', user)
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn : '1h'})
+
+
+
+      res.cookie('token', token,{
+        httpOnly:true,
+        secure:true,
+        sameSite:'none'
+      })
+      .send({success: true});
+    })
+
+   
+    app.post('/logout', async(req, res)=>{
+      const user = req.body;
+      console.log('logging out', user)
+      res.clearCookie('token', {maxAge : 0})
+      .send({success : true})
+    })
+
+
+
+
     // hub api collection
 
+   
     app.get('/room', async(req, res)=>{
         const query = addHubCollection.find()
         const result = await query.toArray()
         res.send(result);
     })
 
-    app.get('/room/:id', async(req, res)=>{
+    // bosailam
+    app.get('/room/:id',logger,verifyToken, async(req, res)=>{
       const id = req.params.id;
+     
       const query= {_id : new ObjectId(id)}
       const result = await addHubCollection.findOne(query)
       res.send(result)
     })
     
-    app.put("/room/:id", async (req, res) => {
+    // bosailam
+    app.put("/room/:id",logger,verifyToken, async (req, res) => {
       const id = req.params.id;
       const filter = {_id: new ObjectId(id)};
       const options = {upsert: true};
@@ -75,6 +133,25 @@ async function run() {
       res.send(result);
     });
 
+// bosailam
+
+    app.put("/rooms/:id", logger,verifyToken, async (req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const ratingInfo = req.body;
+      console.log('ratinggg',id, filter, ratingInfo)
+      const roomreview = ratingInfo.review;
+      console.log(roomreview)
+      const update = {
+        $push: {
+          total_reviews: ratingInfo,
+        },
+      };
+
+      const result = await addHubCollection.updateOne(filter, update);
+      res.send(result);
+    });
+// bosailam
     // review 
     app.get('/review', async(req, res)=>{
       const query = addReviewCollection.find().sort({ "startDate": -1 });
@@ -82,39 +159,22 @@ async function run() {
       res.send(result);
   })
 
-  app.post('/review', async(req, res)=>{
+  // bosailam
+  app.post('/review', logger,verifyToken, async(req, res)=>{
     const review = req.body;
     console.log(review)
     const result = await addReviewCollection.insertOne(review)
     res.send(result);
   })
 
+
+
+
+    // review filter 
+
+
     // price filter
 
-    // app.get('/rooms-filter', async (req, res) => {
-    //   const { minPrice, maxPrice } = req.query;
-    //   let filter = {};
-    
-    //   if (minPrice && maxPrice) {
-    //     filter = {
-    //       price_per_night: {
-    //         $gte: parseInt(minPrice),
-    //         $lte: parseInt(maxPrice)
-    //       }
-    //     };
-    //   } else if (minPrice) {
-    //     filter = { price_per_night: { $gte: parseInt(minPrice) } };
-    //   } else if (maxPrice) {
-    //     filter = { price_per_night: { $lte: parseInt(maxPrice) } };
-    //   } else {
-    //     // No price filter applied
-    //     filter = {};
-    //   }
-    
-    //   const cursor = addHubCollection.find(filter);
-    //   const result = await cursor.toArray();
-    //   res.send(result);
-    // });
     
     app.get('/rooms-filter', async (req, res) => {
       const { minPrice, maxPrice } = req.query;
@@ -149,20 +209,25 @@ async function run() {
 
     // booking
 
-    app.get('/booking', async(req, res)=>{
+    app.get('/booking',logger,verifyToken, async(req, res)=>{
       const result = await addBookingCollection.find().toArray();
       res.send(result)
     })
 
-    app.post('/booking', async(req, res)=>{
+    // bosailam 
+    app.post('/booking',logger,verifyToken, async(req, res)=>{
       const booking = req.body;
+   
       console.log(booking)
       const result = await addBookingCollection.insertOne(booking)
       res.send(result);
     })
 
+    // get a single booked 
+  
+    // bosailam
     // booking delete
-    app.delete('/booking/:id', async(req, res)=>{
+    app.delete('/booking/:id',logger,verifyToken, async(req, res)=>{
       const id = req.params.id;
       console.log('delete booking', id);
       const query = {_id: new ObjectId(id)}
@@ -170,9 +235,9 @@ async function run() {
       res.send(result);
     })
 
- 
+    // bosailam
 
-    app.patch('/booking/:id', async (req, res) => {
+    app.patch('/booking/:id',logger,verifyToken, async (req, res) => {
       try {
           const id = req.params.id;
           const newDate = req.body.date; 
@@ -193,8 +258,13 @@ async function run() {
     // get all booking room by a specific user
   
 
-      app.get('/booking/:email', async (req, res) => {
+      app.get('/booking/:email',logger,verifyToken, async (req, res) => {
         const email = req.params.email;
+        console.log('token owner info', req.user)
+        console.log(email)
+        if(req.user.email !== email){
+          return res.status(403).send({message: 'forbidden access'})
+        }
         const result = await addBookingCollection.find({ email }).toArray();
         res.send(result);
       });
